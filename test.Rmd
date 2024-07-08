@@ -1,0 +1,103 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-04-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+library(fpp3)
+
+set.seed(1408)
+
+# Define parameters
+n <- 500
+c <- 0
+phi <- 0.6
+theta <- 0.2    
+sigma <- 1
+
+
+tsibble(time = 1:n, y = generate_arma(n, c, phi, theta), 
+        index = time) |>
+  gg_tsdisplay(y, plot_type = "partial")
+
+```
+
+```{r}
+
+set.seed(1408)
+
+generate_ar1 <- function(n = 100, c = 0, phi, sigma = 1) {
+  # Generate errors
+  error <- rnorm(n, mean = 0, sd = sigma)
+  # Set up vector for the response with initial values set to 0
+  y <- rep(0, n)
+  # Generate remaining observations
+  for(i in seq(2, length = n-1)) {
+    y[i] <- c + phi * y[i-1] + error[i]
+  }
+  return(y)
+}
+
+library(fpp3)
+tsibble(time = 1:n, y = generate_ar1(n, c, phi), index = time) |>
+  gg_tsdisplay(y, plot_type = "partial")
+
+```
+
+```{r}
+
+generate_arma11 <- function(n = 100, c = 0, phi, theta, sigma = 1) {
+  # Generate errors
+  error <- rnorm(n, mean = 0, sd = sigma)
+  # Set up vector for the response with initial values set to 0
+  y <- rep(0, n)
+  # Generate remaining observations
+  for(i in seq(2, length = n-1)) {
+    # AR(1)
+    # y[i] <- c + phi * y[i-1] + error[i]
+    
+    # MA(1)
+    # y[i] <- c + error[i] + theta * error[i -1]
+    
+    # ARMA(1, 1)
+    y [i] <- c + phi * y[i-1] + error[i] + theta * error[i -1]
+  }
+  return(y)
+}
+
+set.seed(1408)
+
+tsibble(time = 1:n, y = generate_arma11(n, c, 
+                                          phi, theta), 
+        index = time) |>
+  gg_tsdisplay(y, plot_type = "partial")
+
+```
+
+
+
+```{r}
+
+set.seed(1408)
+
+# phi = NULL
+
+generate_arma(n, c, phi, theta)
+
+```
+
+```{r}
+
+set.seed(1408)
+
+generate_ar1(n, c, phi)
+
+```
+
+
